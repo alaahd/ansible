@@ -31,7 +31,7 @@
         - active
     
     - name: Create backup folder in the local server 
-      local_action: file path={{ local_bk_dir }}{{ ansible_date_time.date }} state=directory
+      local_action: file path={{ local_bk_dir }}{{ ansible_date_time.date }} state=directory mode=0777
       tags:
         - active
         - ac

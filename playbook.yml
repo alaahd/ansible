@@ -31,7 +31,7 @@
         - active
     
     - name: Create backup folder in the local server 
-      local_action: file path={{ local_bk_dir }}{{ ansible_date_time.date }} state=directory mode=0777
+      local_action: file path={{ local_bk_dir }}{{ ansible_date_time.date }} state=directory
       tags:
         - active
         - ac
@@ -44,7 +44,7 @@
         - db
 
     - name: Delete the oldest backup folder in local to save space in the server
-      local_action: command ls {{ local_bk_dir }} | head -1 | xargs rm -Rf 
+      local_action: shell ls {{ local_bk_dir }} | head -1 | xargs rm -rf chdir={{ local_bk_dir }}
       tags:
         - active
         - folders

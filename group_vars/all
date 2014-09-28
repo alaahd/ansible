@@ -1,2 +1,2 @@
 remote_bk_dir: /usr/local/backup/
-local_bk_dir: /var/www/store/
+local_bk_dir: /var/www/ansible/store/

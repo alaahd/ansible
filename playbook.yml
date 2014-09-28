@@ -1,0 +1,60 @@
+---
+- name: "Start the Backup proccess"
+  hosts: webservers
+  sudo: true
+  
+  tasks: 
+    - name: Installs python-mysqldb
+      apt: name=python-mysqldb state=installed
+      tags:
+        - db
+        - active
+
+    - name: Create Backup folder
+      file: path={{ remote_bk_dir }} state=directory
+      tags:
+        - folders
+        - db
+        - active
+     
+    - name: Dump databases
+      mysql_db: login_user={{ db_user }} login_host={{ db_host }} login_password={{ db_pass }} name={{ db_name }} state=dump target={{ remote_bk_dir }}db.sql.gz
+      tags:
+        - folders
+        - db
+        - active
+
+    - name: Compress site folder
+      command: tar -cvzf {{ remote_bk_dir }}web.tar.gz {{ home_dir }} --exclude {{ home_exclude }}
+      tags:
+        - folders
+        - active
+    
+    - name: Create backup folder in the local server 
+      local_action: file path={{ local_bk_dir }}{{ ansible_date_time.date }} state=directory
+      tags:
+        - active
+        - ac
+
+    - name: Fetch all backup files from remote host
+      local_action: command scp {{ hostvars[inventory_hostname]['ansible_ssh_user'] }}@{{ inventory_hostname }}:{{ remote_bk_dir }}* {{ local_bk_dir }}{{ ansible_date_time.date }}/
+      tags:
+        - active
+        - folders
+        - db
+
+    - name: Delete the oldest backup folder in local to save space in the server
+      local_action: command ls {{ local_bk_dir }} | head -1 | xargs rm -Rf 
+      tags:
+        - active
+        - folders
+        - db
+        - test
+
+
+    - name: Delete temp backup folder from server
+      file: path={{ remote_bk_dir }} state=absent
+      tags:
+        - folders
+        - active
+

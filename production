@@ -1,0 +1,2 @@
+[webservers]
+gs.sport360.com ansible_ssh_user=ubuntu
